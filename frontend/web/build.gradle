@@ -1,22 +1,26 @@
-apply plugin: 'kotlin2js'
-apply plugin: 'kotlin-dce-js'
-apply plugin: 'org.jetbrains.kotlin.frontend'
+apply plugin: 'org.jetbrains.kotlin.js'
 apply plugin: 'distribution'
 
-dependencies {
-  compile project(':search:presenter')
-  compile project(':references')
+archivesBaseName = 'sdk-search'
 
-  compile deps.kotlin.stdlib.js
-  compile deps.kotlin.coroutines.js
-  compile deps.timber.js
-}
+// TODO umd
+kotlin {
+  target {
+    useCommonJs()
+    browser()
+  }
 
-kotlinFrontend {
-  webpackBundle {
-    bundleName = 'sdk-search'
-    contentPath = file('src/main/web')
-    mode = 'none'
+  sourceSets {
+    main {
+      dependencies {
+        implementation project(':search:presenter')
+        implementation project(':references')
+
+        implementation deps.kotlin.stdlib.js
+        implementation deps.kotlin.coroutines.js
+        implementation deps.timber.js
+      }
+    }
   }
 }
 
@@ -25,14 +29,13 @@ distributions {
     baseName = 'sdk-search'
 
     contents {
-      from 'src/main/web'
-      from "$buildDir/bundle/sdk-search.bundle.js"
+      from 'src/main/resources'
+      // TODO https://youtrack.jetbrains.com/issue/KT-32209
+      from "$buildDir/libs/SdkSearch-web.js"
     }
   }
 }
 
+distZip.dependsOn('browserWebpack')
+installDist.dependsOn('browserWebpack')
 distTar.enabled = false
-
-compileKotlin2Js {
-  kotlinOptions.moduleKind = 'umd'
-}

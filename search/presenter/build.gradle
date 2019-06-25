@@ -8,12 +8,27 @@ configurations {
   compileClasspath
 }
 
+android {
+  compileSdkVersion buildConfig.compileSdk
+
+  defaultConfig {
+    minSdkVersion buildConfig.minSdk
+  }
+
+  lintOptions {
+    textReport true
+    textOutput 'stdout'
+    lintConfig rootProject.file('lint.xml')
+
+    // We run a full lint analysis as build part in CI, so skip vital checks for assemble task.
+    checkReleaseBuilds false
+  }
+}
+
 kotlin {
   android()
   js {
-    compilations.main.kotlinOptions {
-      moduleKind = 'umd'
-    }
+    browser()
   }
 
   sourceSets {
@@ -37,22 +52,5 @@ kotlin {
         api deps.kotlin.coroutines.js
       }
     }
-  }
-}
-
-android {
-  compileSdkVersion buildConfig.compileSdk
-
-  defaultConfig {
-    minSdkVersion buildConfig.minSdk
-  }
-
-  lintOptions {
-    textReport true
-    textOutput 'stdout'
-    lintConfig rootProject.file('lint.xml')
-
-    // We run a full lint analysis as build part in CI, so skip vital checks for assemble task.
-    checkReleaseBuilds false
   }
 }

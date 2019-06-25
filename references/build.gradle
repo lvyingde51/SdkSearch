@@ -10,6 +10,8 @@ configurations {
 kotlin {
   jvm()
   js {
+    browser()
+
     // TODO apply this automatically on all multiplatform projects using js presets.
     compilations.all {
       kotlinOptions {
